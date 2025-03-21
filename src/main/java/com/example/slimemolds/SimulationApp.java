@@ -2,8 +2,10 @@ package com.example.slimemolds;
 
 import com.example.slimemolds.core.Simulation;
 import com.example.slimemolds.model.Agent;
+import com.example.slimemolds.ui.SimulationCanvas;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -22,32 +24,37 @@ public class SimulationApp extends Application {
     private List<Agent> agents = new ArrayList<>();
     private Random random = new Random();
     private Simulation simulation;
+    private SimulationCanvas canvas;
     
     @Override
     public void start(Stage stage) {
         // Création du panneau principal
-        Pane root = new Pane();
+        BorderPane root = new BorderPane();
+
+        canvas = new SimulationCanvas(WIDTH, HEIGHT);
+        root.setCenter(canvas);
+
         root.setPrefSize(WIDTH, HEIGHT);
-        
-        // Création des agents (cercles) à des positions aléatoires
+
         for (int i = 0; i < NUM_AGENTS; i++) {
             double x = random.nextDouble() * (WIDTH - 2 * AGENT_RADIUS) + AGENT_RADIUS;
             double y = random.nextDouble() * (HEIGHT - 2 * AGENT_RADIUS) + AGENT_RADIUS;
-            
+
             Agent agent = new Agent(x, y, AGENT_RADIUS);
             agents.add(agent);
-            root.getChildren().add(agent);
         }
+
+        canvas.drawAgents(agents);
         
         // Configuration de la scène
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setTitle("Simulation de Slime Mold");
         stage.setScene(scene);
-        stage.setResizable(false);
         stage.show();
         
         // Configuration et démarrage de la simulation
-        simulation = new Simulation(agents, root);
+        simulation = new Simulation(agents, canvas);
+        simulation.start();
         
         // Gestion de la fermeture de l'application
         stage.setOnCloseRequest(event -> {
