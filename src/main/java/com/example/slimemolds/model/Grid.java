@@ -50,8 +50,8 @@ public class Grid {
         this.foodGrid = new double[gridWidth][gridHeight];
         this.nextFoodGrid = new double[gridWidth][gridHeight];
 
-        this.diffusionRate = 0.1;
-        this.evaporationRate = 0.95;
+        this.diffusionRate = 0.10;  // Réduit de 0.1 à 0.05 pour diffusion plus lente
+        this.evaporationRate = 0.995; // Augmenté de 0.95 à 0.99 pour évaporation bien plus lente
     }
 
     private int toGridX(double worldX) {
@@ -160,6 +160,17 @@ public class Grid {
 
 
     public void render(GraphicsContext gc) {
+        // Trouver les valeurs max pour normalisation dynamique
+        double maxTrailValue = 0.01; // Petite valeur non-zéro pour éviter division par zéro
+        double maxFoodValue = 0.01;
+        
+        for (int x = 0; x < gridWidth; x++) {
+            for (int y = 0; y < gridHeight; y++) {
+                maxTrailValue = Math.max(maxTrailValue, trailGrid[x][y]);
+                maxFoodValue = Math.max(maxFoodValue, foodGrid[x][y]);
+            }
+        }
+        
         // Pour chaque cellule de la grille
         for (int gridX = 0; gridX < gridWidth; gridX++) {
             for (int gridY = 0; gridY < gridHeight; gridY++) {
@@ -171,24 +182,29 @@ public class Grid {
                 double foodValue = foodGrid[gridX][gridY];
 
                 // Visualisation des phéromones (par exemple, mélange de couleurs)
-                if (trailValue > 0 || foodValue > 0) {
+                if (trailValue > 0.001 || foodValue > 0.001) { // Seuil minimal pour le rendu
                     // Normaliser les valeurs pour l'affichage
-                    double maxTrail = 10.0; // Valeur max attendue, à ajuster
-                    double maxFood = 10.0;  // Valeur max attendue, à ajuster
+                    double trailIntensity = Math.min(1.0, trailValue / maxTrailValue);
+                    double foodIntensity = Math.min(1.0, foodValue / maxFoodValue);
 
-                    double trailIntensity = Math.min(1.0, trailValue / maxTrail);
-                    double foodIntensity = Math.min(1.0, foodValue / maxFood);
-
-                    // Mélange de bleu (sentier) et de vert (nourriture)
-                    int blue = (int)(255 * trailIntensity);
-                    int green = (int)(255 * foodIntensity);
-                    Color cellColor = Color.rgb(0, green, blue, 0.7);
+                    // Mélange de couleurs: bleu pour trail, vert pour food
+                    double blue = 255 * trailIntensity;
+                    double green = 255 * foodIntensity;
+                    
+                    // Ajout d'un peu de rouge si les deux types sont présents pour un effet visuel
+                    double red = (trailIntensity > 0 && foodIntensity > 0) ? 
+                                  Math.min(trailIntensity, foodIntensity) * 128 : 0;
+                    
+                    Color cellColor = Color.rgb((int)red, (int)green, (int)blue, 0.7);
 
                     gc.setFill(cellColor);
                     gc.fillRect(worldX, worldY, cellSize, cellSize);
                 }
             }
         }
+        
+        // Afficher les valeurs max pour debug (à commenter en production)
+        //System.out.println("Max Trail: " + maxTrailValue + " | Max Food: " + maxFoodValue);
     }
 
 

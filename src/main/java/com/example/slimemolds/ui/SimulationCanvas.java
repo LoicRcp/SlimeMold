@@ -44,7 +44,9 @@ public class SimulationCanvas extends Canvas {
         scaleX = getWidth() / width;
         scaleY = getHeight() / height;
 
-        gc.clearRect(0,0, getWidth(), getHeight());
+        // Fond noir au lieu de clear
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, getWidth(), getHeight());
     }
 
     public void drawAgents(List<Agent> agents){
@@ -53,8 +55,8 @@ public class SimulationCanvas extends Canvas {
             double y = agent.getCenterY() * scaleY;
             double radius = agent.getRadius() * Math.min(scaleX, scaleY);
 
-            // Dessiner le corps de l'agent
-            gc.setFill(Color.BLUE);
+            // Dessiner le corps de l'agent (blanc sur fond noir pour meilleure visibilité)
+            gc.setFill(Color.YELLOW);
             gc.fillOval(x - radius, y - radius, radius * 2, radius * 2);
 
             // Dessiner une indication de la direction de l'agent

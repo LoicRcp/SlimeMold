@@ -2,6 +2,7 @@ package com.example.slimemolds;
 
 import com.example.slimemolds.core.Simulation;
 import com.example.slimemolds.model.Agent;
+import com.example.slimemolds.model.Grid;
 import com.example.slimemolds.ui.SimulationCanvas;
 import javafx.application.Application;
 import javafx.scene.Scene;
