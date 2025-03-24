@@ -71,27 +71,52 @@ public class Grid {
     }
 
 
+    private int normaliseGridX(int gridx){
+        return ((gridx % gridWidth) + gridWidth) % gridWidth;
+    }
+
+    private int normaliseGridY(int gridy){
+        return ((gridy % gridHeight) + gridHeight) % gridHeight;
+    }
+
+
     public void depositTrailPheromone(double worldX, double worldY, double value){
         int gridX = toGridX(worldX);
         int gridY = toGridY(worldY);
+
+        gridX = normaliseGridX(gridX);
+        gridY = normaliseGridY(gridY);
+
         trailGrid[gridX][gridY] += value;
     }
 
     public void depositFoodPheromone(double worldX, double worldY, double value){
         int gridX = toGridX(worldX);
         int gridY = toGridY(worldY);
+
+        gridX = normaliseGridX(gridX);
+        gridY = normaliseGridY(gridY);
+
         foodGrid[gridX][gridY] += value;
     }
 
     public double senseTrailPheromone(double worldX, double worldY){
         int gridX = toGridX(worldX);
         int gridY = toGridY(worldY);
+
+        gridX = normaliseGridX(gridX);
+        gridY = normaliseGridY(gridY);
+
         return trailGrid[gridX][gridY];
     }
 
     public double senseFoodPheromone(double worldX, double worldY){
         int gridX = toGridX(worldX);
         int gridY = toGridY(worldY);
+
+        gridX = normaliseGridX(gridX);
+        gridY = normaliseGridY(gridY);
+
         return foodGrid[gridX][gridY];
     }
 
@@ -115,33 +140,25 @@ public class Grid {
             for (int y = 0; y < gridHeight; y++) {
 
                 double currentValue = sourceGrid[x][y];
+
                 double remaining = currentValue * (1 - diffusionRate);
-                double toShare = currentValue * diffusionRate;
-
-                double totalWeight = 0;
-                for (int d = 0; d < directions.length; d++) {
-                    int nx = x + directions[d][0];
-                    int ny = y + directions[d][1];
-
-                    if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
-                        totalWeight += weights[d];
-                    }
-                }
-
-                double scaleFact = (totalWeight > 0) ? diffusionRate / totalWeight : 0;
-
-
-                for (int d = 0; d < directions.length; d++) {
-                    int nx = x + directions[d][0];
-                    int ny = y + directions[d][1];
-
-                    if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
-                        targetGrid[nx][ny] += sourceGrid[x][y] * weights[d] * scaleFact;
-                    }
-                }
                 targetGrid[x][y] += remaining;
 
-                // evaporation
+                double toShare = currentValue * diffusionRate;
+
+
+                for (int d = 0; d < directions.length; d++) {
+                    int nx = normaliseGridX(x + directions[d][0]);
+                    int ny = normaliseGridY(y + directions[d][1]);
+
+                    // Diffuser selon le poids prédéfini
+                    targetGrid[nx][ny] += toShare * weights[d];
+                }
+            }
+        }
+
+        for (int x = 0; x < gridWidth; x++) {
+            for (int y = 0; y < gridHeight; y++) {
                 targetGrid[x][y] *= evaporationRate;
             }
         }

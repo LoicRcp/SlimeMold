@@ -7,4 +7,8 @@ module com.example.slimemolds {
 
     opens com.example.slimemolds to javafx.fxml;
     exports com.example.slimemolds;
+    exports com.example.slimemolds.core;
+    opens com.example.slimemolds.core to javafx.fxml;
+    exports com.example.slimemolds.model;
+    opens com.example.slimemolds.model to javafx.fxml;
 }
