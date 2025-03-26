@@ -85,8 +85,10 @@ public class Simulation {
         // Mettre à jour la grille de phéromones
         pheromoneGrid.updateGrids();
         
-        // Cette méthode sera étendue plus tard pour mettre à jour la position des agents
-        // et implémenter les comportements de la simulation de slime mold
+        // Mettre à jour les agents
+        for (Agent agent : agents) {
+            agent.update(pheromoneGrid);
+        }
     }
 
     private void render() {

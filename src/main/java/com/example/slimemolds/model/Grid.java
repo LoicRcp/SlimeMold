@@ -224,11 +224,11 @@ public class Grid {
         //System.out.println("Max Trail: " + maxTrailValue + " | Max Food: " + maxFoodValue);
     }
 
+    public int getWidth() {
+        return width;
+    }
 
-
-
-
-
-
-
+    public int getHeight() {
+        return height;
+    }
 }
